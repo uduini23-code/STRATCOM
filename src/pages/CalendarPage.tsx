@@ -258,7 +258,7 @@ export default function CalendarPage() {
                           {event.title}
                         </p>
                         <span className="text-[9px] font-bold uppercase tracking-wider opacity-80 whitespace-nowrap ml-2">
-                          {event.department === 'For MultiMedia' ? event.eventType : event.requestType}
+                          {event.department === 'Multimedia' ? event.eventType : event.requestType}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 mt-1.5 text-xs opacity-80">
@@ -306,7 +306,7 @@ export default function CalendarPage() {
                       </span>
                     )}
                     <p className="text-white/90 text-sm font-medium">
-                      {selectedEvent.department === 'For MultiMedia' ? selectedEvent.eventType : selectedEvent.requestType}
+                      {selectedEvent.department === 'Multimedia' ? selectedEvent.eventType : selectedEvent.requestType}
                     </p>
                   </div>
                 </div>
