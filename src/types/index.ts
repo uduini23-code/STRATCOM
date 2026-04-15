@@ -10,7 +10,7 @@ export interface Update {
 }
 
 export type EventType = 'ADMIN COVERAGE' | 'STUDENT COVERAGE' | 'PROJECT' | 'CAPACITY BUILDING';
-export type DepartmentType = 'For MultiMedia' | 'For Graphics';
+export type DepartmentType = 'Multimedia' | 'Graphics';
 export type RequestType = 'Design Request' | 'Pubmat Checking' | 'Approval';
 
 export interface CalendarEvent {
@@ -27,6 +27,7 @@ export interface CalendarEvent {
   requestType?: RequestType;
   assignedTo?: string[];
   attachments?: { name: string; data: string }[];
+  status?: 'pending' | 'approved' | 'rejected';
 }
 
 export type UserRole = 'admin' | 'viewer' | null;
@@ -45,4 +46,5 @@ export interface AuthState {
   username?: string;
   canManageEvents?: boolean;
   canManageUpdates?: boolean;
+  canApproveEvents?: boolean;
 }

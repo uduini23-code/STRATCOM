@@ -12,6 +12,7 @@ import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUpdatesPage from './pages/AdminUpdatesPage';
 import AdminEventsPage from './pages/AdminEventsPage';
+import AdminApprovalsPage from './pages/AdminApprovalsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function AppContent() {
@@ -55,6 +56,14 @@ function AppContent() {
                   element={
                     <ProtectedAdminRoute requireManageEvents>
                       <AdminEventsPage />
+                    </ProtectedAdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/approvals"
+                  element={
+                    <ProtectedAdminRoute requireApproveEvents>
+                      <AdminApprovalsPage />
                     </ProtectedAdminRoute>
                   }
                 />

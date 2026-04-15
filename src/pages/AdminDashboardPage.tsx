@@ -2,7 +2,7 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import {
-  Image,
+  Image as ImageIcon,
   Calendar,
   TrendingUp,
   Users,
@@ -10,15 +10,19 @@ import {
   Clock,
   MapPin,
   Play,
+  CheckCircle,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { EVENT_COLORS } from './AdminEventsPage';
 
 export default function AdminDashboardPage() {
   const { updates, events } = useData();
-  const { role, username, canManageEvents, canManageUpdates } = useAuth();
+  const { role, username, canManageEvents, canManageUpdates, canApproveEvents } = useAuth();
 
-  const upcomingEvents = events
+  const approvedEvents = events.filter(e => e.status === 'approved' || !e.status);
+  const pendingEventsCount = events.filter(e => e.status === 'pending').length;
+
+  const upcomingEvents = approvedEvents
     .filter((e) => {
       const targetDate = e.endDate ? new Date(e.endDate) : new Date(e.date);
       return targetDate >= new Date(new Date().toDateString());
@@ -34,7 +38,7 @@ export default function AdminDashboardPage() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
-  const thisMonthEvents = events.filter((e) => {
+  const thisMonthEvents = approvedEvents.filter((e) => {
     const d = parseISO(e.date);
     const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
@@ -61,14 +65,14 @@ export default function AdminDashboardPage() {
           {
             label: 'Total Updates',
             value: updates.length,
-            icon: Image,
+            icon: ImageIcon,
             color: 'text-primary',
             bg: 'bg-primary-bg',
             border: 'border-green-100',
           },
           {
             label: 'Total Events',
-            value: events.length,
+            value: approvedEvents.length,
             icon: Calendar,
             color: 'text-blue-600',
             bg: 'bg-blue-50',
@@ -104,14 +108,14 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 animate-fade-in">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 animate-fade-in">
         {canManageUpdates && (
           <Link
             to="/admin/updates"
             className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
           >
             <div className="w-12 h-12 bg-primary-bg rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
-              <Image className="w-6 h-6 text-primary group-hover:text-white" />
+              <ImageIcon className="w-6 h-6 text-primary group-hover:text-white" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-accent">Manage Updates</h3>
@@ -133,6 +137,26 @@ export default function AdminDashboardPage() {
               <p className="text-sm text-muted">Add, edit, or remove calendar events</p>
             </div>
             <ArrowRight className="w-5 h-5 text-muted group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+          </Link>
+        )}
+        {canApproveEvents && (
+          <Link
+            to="/admin/approvals"
+            className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-yellow-300 hover:shadow-md transition-all"
+          >
+            <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center group-hover:bg-yellow-500 transition-colors relative">
+              <CheckCircle className="w-6 h-6 text-yellow-600 group-hover:text-white" />
+              {pendingEventsCount > 0 && (
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
+                  {pendingEventsCount}
+                </span>
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-accent">Event Approvals</h3>
+              <p className="text-sm text-muted">Review and approve pending events</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted group-hover:text-yellow-600 group-hover:translate-x-1 transition-all" />
           </Link>
         )}
       </div>

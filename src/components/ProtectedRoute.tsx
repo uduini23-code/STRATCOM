@@ -5,10 +5,11 @@ interface ProtectedAdminRouteProps {
   children: React.ReactNode;
   requireManageEvents?: boolean;
   requireManageUpdates?: boolean;
+  requireApproveEvents?: boolean;
 }
 
-export function ProtectedAdminRoute({ children, requireManageEvents, requireManageUpdates }: ProtectedAdminRouteProps) {
-  const { role, isAuthenticated, canManageEvents, canManageUpdates } = useAuth();
+export function ProtectedAdminRoute({ children, requireManageEvents, requireManageUpdates, requireApproveEvents }: ProtectedAdminRouteProps) {
+  const { role, isAuthenticated, canManageEvents, canManageUpdates, canApproveEvents } = useAuth();
 
   if (!isAuthenticated || role !== 'admin') {
     return <Navigate to="/admin/login" replace />;
@@ -19,6 +20,10 @@ export function ProtectedAdminRoute({ children, requireManageEvents, requireMana
   }
 
   if (requireManageUpdates && !canManageUpdates) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  if (requireApproveEvents && !canApproveEvents) {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

@@ -34,10 +34,12 @@ export default function CalendarPage() {
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
   const startDay = getDay(monthStart);
 
+  const approvedEvents = useMemo(() => events.filter(e => e.status === 'approved' || !e.status), [events]);
+
   const eventsByDate = useMemo(() => {
     const map: Record<string, (CalendarEvent | null)[]> = {};
     
-    const sortedEvents = [...events].sort((a, b) => {
+    const sortedEvents = [...approvedEvents].sort((a, b) => {
       const aStart = new Date(a.date).getTime();
       const bStart = new Date(b.date).getTime();
       if (aStart !== bStart) return aStart - bStart;
@@ -94,7 +96,7 @@ export default function CalendarPage() {
   }, [events]);
 
   const upcomingEvents = useMemo(() => {
-    return events
+    return approvedEvents
       .filter((e) => {
         const targetDate = e.endDate ? new Date(e.endDate) : new Date(e.date);
         return targetDate >= new Date(new Date().toDateString());

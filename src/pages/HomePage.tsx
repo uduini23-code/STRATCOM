@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
-import { ArrowRight, Calendar, Image, Play, Clock, MapPin, Shield } from 'lucide-react';
+import { ArrowRight, Calendar, Image as ImageIcon, Play, Clock, MapPin, Shield } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { EVENT_COLORS } from './AdminEventsPage';
 
@@ -55,7 +55,7 @@ export default function HomePage() {
                 to="/updates"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
               >
-                <Image className="w-5 h-5" />
+                <ImageIcon className="w-5 h-5" />
                 View Updates
               </Link>
               <Link
@@ -74,7 +74,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Updates', value: updates.length, icon: Image },
+            { label: 'Total Updates', value: updates.length, icon: ImageIcon },
             { label: 'Upcoming Events', value: upcomingEvents.length, icon: Calendar },
             { label: 'This Month', value: updates.filter(u => {
               const d = parseISO(u.createdAt);
@@ -113,7 +113,7 @@ export default function HomePage() {
 
         {latestUpdates.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-border">
-            <Image className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-muted">No updates yet. Check back soon!</p>
           </div>
         ) : (
@@ -200,19 +200,31 @@ export default function HomePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-accent">{event.title}</h3>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${EVENT_COLORS[event.eventType] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
-                        {event.eventType}
+                      {event.department && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-gray-100 text-gray-800 border-gray-200">
+                          {event.department}
+                        </span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${event.eventType ? (EVENT_COLORS[event.eventType] || 'bg-gray-100 text-gray-800 border-gray-200') : 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                        {event.department === 'Multimedia' ? event.eventType : event.requestType}
                       </span>
+                      {event.status === 'pending' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-yellow-100 text-yellow-800 border-yellow-200">
+                          Pending Approval
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-3 mt-1.5">
                       <span className="inline-flex items-center gap-1 text-xs text-muted">
                         <Clock className="w-3.5 h-3.5" />
                         {event.time}
                       </span>
-                      <span className="inline-flex items-center gap-1 text-xs text-muted">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {event.venue}
-                      </span>
+                      {event.venue && (
+                        <span className="inline-flex items-center gap-1 text-xs text-muted">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {event.venue}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

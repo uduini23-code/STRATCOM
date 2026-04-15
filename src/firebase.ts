@@ -22,7 +22,7 @@ if (!firebaseConfig.apiKey && localConfigModule) {
 }
 
 // Prevent app crash if config is completely missing (e.g., forgot to set env vars in Vercel)
-const isConfigValid = !!firebaseConfig.apiKey;
+const isConfigValid = !!firebaseConfig.apiKey && firebaseConfig.apiKey !== 'missing-api-key';
 if (!isConfigValid) {
   console.error("🚨 FIREBASE CONFIGURATION MISSING! 🚨");
   console.error("If you are on Vercel, make sure you added all VITE_FIREBASE_* environment variables AND triggered a new deployment.");
@@ -32,12 +32,15 @@ if (!isConfigValid) {
 }
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
+
+// Only initialize Auth and Firestore if we have a valid config, otherwise export null/dummy objects
+// This prevents the "auth/invalid-api-key" crash when the dummy config is used
+export const auth = isConfigValid ? getAuth(app) : null as any;
+export const db = isConfigValid ? getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)') : null as any;
 
 // Test connection
 async function testConnection() {
-  if (!isConfigValid) return;
+  if (!isConfigValid || !db) return;
   
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));

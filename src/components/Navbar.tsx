@@ -5,19 +5,20 @@ import {
   Menu,
   X,
   Home,
-  Image,
+  Image as ImageIcon,
   Calendar,
   Shield,
   LogOut,
   LayoutDashboard,
   ChevronDown,
   Bell,
+  CheckCircle,
 } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Navbar() {
-  const { role, isAuthenticated, logout, canManageEvents, canManageUpdates } = useAuth();
+  const { role, isAuthenticated, logout, canManageEvents, canManageUpdates, canApproveEvents } = useAuth();
   const { notifications, markNotificationAsRead, markAllNotificationsAsRead } = useData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,14 +36,15 @@ export default function Navbar() {
 
   const navLinks = [
     { path: '/', label: 'Home', icon: Home },
-    { path: '/updates', label: 'Updates', icon: Image },
+    { path: '/updates', label: 'Updates', icon: ImageIcon },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
   ];
 
   const adminLinks = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    ...(canManageUpdates ? [{ path: '/admin/updates', label: 'Manage Updates', icon: Image }] : []),
+    ...(canManageUpdates ? [{ path: '/admin/updates', label: 'Manage Updates', icon: ImageIcon }] : []),
     ...(canManageEvents ? [{ path: '/admin/events', label: 'Manage Events', icon: Calendar }] : []),
+    ...(canApproveEvents ? [{ path: '/admin/approvals', label: 'Approvals', icon: CheckCircle }] : []),
   ];
 
   const isActive = (path: string) => {

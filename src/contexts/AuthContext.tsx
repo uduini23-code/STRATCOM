@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (parsed.role === 'admin' && parsed.username) {
           parsed.canManageEvents = ['SCOSEC', 'SCODIR'].includes(parsed.username);
           parsed.canManageUpdates = ['SCOGRAP', 'SCOMMA', 'SCODIR'].includes(parsed.username);
+          parsed.canApproveEvents = parsed.username === 'SCODIR';
         }
         return parsed;
       } catch {
@@ -38,13 +39,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (ADMIN_USERS[username as keyof typeof ADMIN_USERS] === password) {
       const canManageEvents = ['SCOSEC', 'SCODIR'].includes(username);
       const canManageUpdates = ['SCOGRAP', 'SCOMMA', 'SCODIR'].includes(username);
+      const canApproveEvents = username === 'SCODIR';
       
       const state: AuthState = { 
         role: 'admin', 
         isAuthenticated: true, 
         username,
         canManageEvents,
-        canManageUpdates
+        canManageUpdates,
+        canApproveEvents
       };
       setAuth(state);
       localStorage.setItem('sco_auth', JSON.stringify(state));

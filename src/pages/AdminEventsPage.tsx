@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
 import { CalendarEvent, EventType, DepartmentType, RequestType } from '../types';
 import {
@@ -43,6 +44,7 @@ const ASSIGNABLE_USERS = [
 export default function AdminEventsPage() {
   const { events, addEvent, editEvent, deleteEvent } = useData();
   const { showToast } = useToast();
+  const { canApproveEvents } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [search, setSearch] = useState('');
@@ -126,7 +128,7 @@ export default function AdminEventsPage() {
     setIsMultiDay(false);
     setForm({ 
       title: '', date: '', endDate: '', time: '', venue: '', description: '', 
-      department: 'For MultiMedia', eventType: 'ADMIN COVERAGE', requestType: 'Design Request', 
+      department: 'Multimedia', eventType: 'ADMIN COVERAGE', requestType: 'Design Request', 
       assignedTo: [], attachments: [] 
     });
     setModalOpen(true);
@@ -142,7 +144,7 @@ export default function AdminEventsPage() {
       time: event.time,
       venue: event.venue,
       description: event.description,
-      department: event.department || 'For MultiMedia',
+      department: event.department || 'Multimedia',
       eventType: event.eventType || 'ADMIN COVERAGE',
       requestType: event.requestType || 'Design Request',
       assignedTo: event.assignedTo || [],
@@ -156,15 +158,25 @@ export default function AdminEventsPage() {
     setEditingEvent(null);
     setForm({ 
       title: '', date: '', endDate: '', time: '', venue: '', description: '', 
-      department: 'For MultiMedia', eventType: 'ADMIN COVERAGE', requestType: 'Design Request', 
+      department: 'Multimedia', eventType: 'ADMIN COVERAGE', requestType: 'Design Request', 
       assignedTo: [], attachments: [] 
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.date || !form.time || !form.venue.trim()) {
+    if (!form.title.trim() || !form.date || !form.time) {
       showToast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    if (form.department === 'Multimedia' && !form.venue.trim()) {
+      showToast('Please provide a venue', 'error');
+      return;
+    }
+
+    if (form.department === 'Graphics' && form.assignedTo.length === 0) {
+      showToast('Please assign at least one person', 'error');
       return;
     }
     
@@ -176,18 +188,21 @@ export default function AdminEventsPage() {
     const eventData = {
       ...form,
       endDate: isMultiDay && form.endDate ? form.endDate : undefined,
+      status: canApproveEvents ? 'approved' : 'pending',
     };
 
     if (editingEvent) {
       editEvent(editingEvent.id, eventData);
       showToast('Event updated successfully!', 'success');
     } else {
-      addEvent(form);
-      showToast('Event created successfully!', 'success');
+      addEvent(eventData as any);
+      showToast(canApproveEvents ? 'Event created successfully!' : 'Event submitted for approval!', 'success');
       
-      // Send email notifications
-      if (form.assignedTo.length > 0) {
-        const greetingText = form.department === 'For Graphics' ? 'You have a request.' : 'You have been assigned to an event.';
+      // Send email notifications only if approved immediately, or maybe wait for approval?
+      // Let's send emails only if it's approved, or if we want to notify assignees. 
+      // Since SCOSEC doesn't assign for Multimedia, and Graphics has Zak/Pjohn, let's send if assignedTo > 0
+      if (form.assignedTo.length > 0 && canApproveEvents) {
+        const greetingText = form.department === 'Graphics' ? 'You have a request.' : 'You have been assigned to an event.';
         
         for (const userId of form.assignedTo) {
           const user = ASSIGNABLE_USERS.find(u => u.id === userId);
@@ -198,7 +213,7 @@ export default function AdminEventsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   to: user.email,
-                  subject: `Event Assignment: ${form.department === 'For MultiMedia' ? form.eventType : form.requestType}`,
+                  subject: `Event Assignment: ${form.department === 'Multimedia' ? form.eventType : form.requestType}`,
                   text: `Hello ${user.name},\n\n${greetingText}\n\nEvent: ${form.title}\nDate: ${form.date} ${isMultiDay && form.endDate ? `to ${form.endDate}` : ''}\nTime: ${form.time}\nVenue: ${form.venue}\nDescription: ${form.description}\n\nThank you.`,
                   html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
@@ -212,7 +227,7 @@ export default function AdminEventsPage() {
                         </tr>
                         <tr>
                           <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Type:</strong></td>
-                          <td style="padding: 8px; border-bottom: 1px solid #eee;">${form.department === 'For MultiMedia' ? form.eventType : form.requestType}</td>
+                          <td style="padding: 8px; border-bottom: 1px solid #eee;">${form.department === 'Multimedia' ? form.eventType : form.requestType}</td>
                         </tr>
                         <tr>
                           <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Date:</strong></td>
@@ -357,8 +372,18 @@ export default function AdminEventsPage() {
                           </span>
                         )}
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${event.eventType ? (EVENT_COLORS[event.eventType] || 'bg-gray-100 text-gray-800 border-gray-200') : 'bg-gray-100 text-gray-800 border-gray-200'}`}>
-                          {event.department === 'For MultiMedia' ? event.eventType : event.requestType}
+                          {event.department === 'Multimedia' ? event.eventType : event.requestType}
                         </span>
+                        {event.status === 'pending' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-yellow-100 text-yellow-800 border-yellow-200">
+                            Pending Approval
+                          </span>
+                        )}
+                        {event.status === 'rejected' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-red-100 text-red-800 border-red-200">
+                            Rejected
+                          </span>
+                        )}
                       </div>
                       {event.description && (
                         <p className="text-sm text-muted mt-1 line-clamp-2">{event.description}</p>
@@ -373,10 +398,12 @@ export default function AdminEventsPage() {
                           <Clock className="w-4 h-4 text-primary" />
                           {event.time}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 text-sm text-muted">
-                          <MapPin className="w-4 h-4 text-primary" />
-                          {event.venue}
-                        </span>
+                        {event.venue && (
+                          <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            {event.venue}
+                          </span>
+                        )}
                         {event.attachments && event.attachments.length > 0 && (
                           <span className="inline-flex items-center gap-1.5 text-sm text-muted">
                             <Paperclip className="w-4 h-4 text-primary" />
@@ -459,12 +486,12 @@ export default function AdminEventsPage() {
                 </label>
                 <select
                   value={form.department}
-                  onChange={(e) => setForm({ ...form, department: e.target.value as DepartmentType })}
+                  onChange={(e) => setForm({ ...form, department: e.target.value as DepartmentType, assignedTo: [] })}
                   required
                   className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all bg-white"
                 >
-                  <option value="For MultiMedia">For MultiMedia</option>
-                  <option value="For Graphics">For Graphics</option>
+                  <option value="Multimedia">Multimedia</option>
+                  <option value="Graphics">Graphics</option>
                 </select>
               </div>
 
@@ -487,9 +514,9 @@ export default function AdminEventsPage() {
                 <div>
                   <label className="block text-sm font-medium text-accent mb-1.5">
                     <Tag className="w-3.5 h-3.5 inline mr-1.5" />
-                    {form.department === 'For MultiMedia' ? 'Event Type *' : 'Request Type *'}
+                    {form.department === 'Multimedia' ? 'Event Type *' : 'Request Type *'}
                   </label>
-                  {form.department === 'For MultiMedia' ? (
+                  {form.department === 'Multimedia' ? (
                     <select
                       value={form.eventType}
                       onChange={(e) => setForm({ ...form, eventType: e.target.value as EventType })}
@@ -575,42 +602,46 @@ export default function AdminEventsPage() {
 
               {/* Venue & Assigned To */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-accent mb-1.5">
-                    <MapPin className="w-3.5 h-3.5 inline mr-1.5" />
-                    Venue / Location *
-                  </label>
-                  <input
-                    type="text"
-                    value={form.venue}
-                    onChange={(e) => setForm({ ...form, venue: e.target.value })}
-                    placeholder="e.g., Conference Room A, Main Building"
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-accent mb-1.5">
-                    <UsersIcon className="w-3.5 h-3.5 inline mr-1.5" />
-                    Assign To
-                  </label>
-                  <div className="relative">
-                    <select
-                      multiple
-                      value={form.assignedTo}
-                      onChange={(e) => {
-                        const values = Array.from(e.target.selectedOptions, option => option.value);
-                        setForm({ ...form, assignedTo: values });
-                      }}
-                      className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all bg-white h-[46px]"
-                    >
-                      {ASSIGNABLE_USERS.map(user => (
-                        <option key={user.id} value={user.id}>{user.name}</option>
-                      ))}
-                    </select>
-                    <p className="text-[10px] text-muted mt-1">Hold Ctrl/Cmd to select multiple</p>
+                {form.department === 'Multimedia' && (
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-1.5">
+                      <MapPin className="w-3.5 h-3.5 inline mr-1.5" />
+                      Venue / Location *
+                    </label>
+                    <input
+                      type="text"
+                      value={form.venue}
+                      onChange={(e) => setForm({ ...form, venue: e.target.value })}
+                      placeholder="e.g., Conference Room A, Main Building"
+                      required
+                      className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    />
                   </div>
-                </div>
+                )}
+                {form.department === 'Graphics' && (
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-1.5">
+                      <UsersIcon className="w-3.5 h-3.5 inline mr-1.5" />
+                      Assign To *
+                    </label>
+                    <div className="relative">
+                      <select
+                        multiple
+                        value={form.assignedTo}
+                        onChange={(e) => {
+                          const values = Array.from(e.target.selectedOptions, option => option.value);
+                          setForm({ ...form, assignedTo: values });
+                        }}
+                        className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all bg-white h-[46px]"
+                      >
+                        {ASSIGNABLE_USERS.filter(u => u.name === 'Zak' || u.name === 'Pjohn').map(user => (
+                          <option key={user.id} value={user.id}>{user.name}</option>
+                        ))}
+                      </select>
+                      <p className="text-[10px] text-muted mt-1">Hold Ctrl/Cmd to select multiple</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Description */}

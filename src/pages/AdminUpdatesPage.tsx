@@ -141,7 +141,7 @@ export default function AdminUpdatesPage() {
       {/* Updates Table */}
       {filteredUpdates.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-border animate-fade-in">
-          <Image className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <p className="text-lg font-medium text-accent mb-1">
             {search ? 'No updates match your search' : 'No updates yet'}
           </p>
