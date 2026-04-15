@@ -17,7 +17,7 @@ import { useData } from '../contexts/DataContext';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Navbar() {
-  const { role, isAuthenticated, logout } = useAuth();
+  const { role, isAuthenticated, logout, canManageEvents, canManageUpdates } = useAuth();
   const { notifications, markNotificationAsRead, markAllNotificationsAsRead } = useData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,8 +41,8 @@ export default function Navbar() {
 
   const adminLinks = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/updates', label: 'Manage Updates', icon: Image },
-    { path: '/admin/events', label: 'Manage Events', icon: Calendar },
+    ...(canManageUpdates ? [{ path: '/admin/updates', label: 'Manage Updates', icon: Image }] : []),
+    ...(canManageEvents ? [{ path: '/admin/events', label: 'Manage Events', icon: Calendar }] : []),
   ];
 
   const isActive = (path: string) => {
@@ -56,9 +56,12 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group" onClick={() => setMobileOpen(false)}>
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center group-hover:bg-primary-dark transition-colors">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+            <img 
+              src="https://ik.imagekit.io/UIUXD/sco.png" 
+              alt="SCO Logo" 
+              className="h-10 w-auto object-contain"
+              referrerPolicy="no-referrer"
+            />
             <div className="hidden sm:block">
               <h1 className="text-sm font-bold text-accent leading-tight">Strategic Communications</h1>
               <p className="text-[10px] text-muted font-medium tracking-wider uppercase">Office</p>

@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "Update": {
+      "title": "Update",
+      "description": "A photo or video update",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "link": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["title", "link", "createdAt", "updatedAt"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "A scheduled event",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "endDate": { "type": "string" },
+        "time": { "type": "string" },
+        "venue": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "department": { "type": "string" },
+        "eventType": { "type": "string" },
+        "requestType": { "type": "string" },
+        "assignedTo": { "type": "array", "items": { "type": "string" } },
+        "attachments": { "type": "array" }
+      },
+      "required": ["title", "date", "time", "venue", "createdAt"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "A notification for users",
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "read": { "type": "boolean" },
+        "link": { "type": "string" }
+      },
+      "required": ["message", "createdAt", "read"]
+    },
+    "User": {
+      "title": "User",
+      "description": "A user profile",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "viewer"] },
+        "name": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/updates/{updateId}": {
+      "schema": { "$ref": "#/entities/Update" },
+      "description": "Collection of updates"
+    },
+    "/events/{eventId}": {
+      "schema": { "$ref": "#/entities/CalendarEvent" },
+      "description": "Collection of events"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/AppNotification" },
+      "description": "Collection of global notifications"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Collection of users"
+    }
+  }
+}

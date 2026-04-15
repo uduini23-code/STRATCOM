@@ -21,7 +21,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('sco_auth');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.role === 'admin' && parsed.username) {
+          parsed.canManageEvents = ['SCOSEC', 'SCODIR'].includes(parsed.username);
+          parsed.canManageUpdates = ['SCOGRAP', 'SCOMMA', 'SCODIR'].includes(parsed.username);
+        }
+        return parsed;
       } catch {
         return { role: null, isAuthenticated: false };
       }
@@ -31,7 +36,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback((username: string, password: string): boolean => {
     if (ADMIN_USERS[username as keyof typeof ADMIN_USERS] === password) {
-      const state: AuthState = { role: 'admin', isAuthenticated: true, username };
+      const canManageEvents = ['SCOSEC', 'SCODIR'].includes(username);
+      const canManageUpdates = ['SCOGRAP', 'SCOMMA', 'SCODIR'].includes(username);
+      
+      const state: AuthState = { 
+        role: 'admin', 
+        isAuthenticated: true, 
+        username,
+        canManageEvents,
+        canManageUpdates
+      };
       setAuth(state);
       localStorage.setItem('sco_auth', JSON.stringify(state));
       return true;

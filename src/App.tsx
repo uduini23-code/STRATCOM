@@ -45,7 +45,7 @@ function AppContent() {
                 <Route
                   path="/admin/updates"
                   element={
-                    <ProtectedAdminRoute>
+                    <ProtectedAdminRoute requireManageUpdates>
                       <AdminUpdatesPage />
                     </ProtectedAdminRoute>
                   }
@@ -53,7 +53,7 @@ function AppContent() {
                 <Route
                   path="/admin/events"
                   element={
-                    <ProtectedAdminRoute>
+                    <ProtectedAdminRoute requireManageEvents>
                       <AdminEventsPage />
                     </ProtectedAdminRoute>
                   }

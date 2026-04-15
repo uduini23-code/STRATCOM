@@ -43,4 +43,6 @@ export interface AuthState {
   role: UserRole;
   isAuthenticated: boolean;
   username?: string;
+  canManageEvents?: boolean;
+  canManageUpdates?: boolean;
 }

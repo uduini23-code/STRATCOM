@@ -16,7 +16,7 @@ import { EVENT_COLORS } from './AdminEventsPage';
 
 export default function AdminDashboardPage() {
   const { updates, events } = useData();
-  const { role, username } = useAuth();
+  const { role, username, canManageEvents, canManageUpdates } = useAuth();
 
   const upcomingEvents = events
     .filter((e) => {
@@ -105,32 +105,36 @@ export default function AdminDashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 animate-fade-in">
-        <Link
-          to="/admin/updates"
-          className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
-        >
-          <div className="w-12 h-12 bg-primary-bg rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
-            <Image className="w-6 h-6 text-primary group-hover:text-white" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-accent">Manage Updates</h3>
-            <p className="text-sm text-muted">Add, edit, or remove photo/video updates</p>
-          </div>
-          <ArrowRight className="w-5 h-5 text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" />
-        </Link>
-        <Link
-          to="/admin/events"
-          className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
-        >
-          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-            <Calendar className="w-6 h-6 text-blue-600 group-hover:text-white" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-accent">Manage Events</h3>
-            <p className="text-sm text-muted">Add, edit, or remove calendar events</p>
-          </div>
-          <ArrowRight className="w-5 h-5 text-muted group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-        </Link>
+        {canManageUpdates && (
+          <Link
+            to="/admin/updates"
+            className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
+          >
+            <div className="w-12 h-12 bg-primary-bg rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+              <Image className="w-6 h-6 text-primary group-hover:text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-accent">Manage Updates</h3>
+              <p className="text-sm text-muted">Add, edit, or remove photo/video updates</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" />
+          </Link>
+        )}
+        {canManageEvents && (
+          <Link
+            to="/admin/events"
+            className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
+          >
+            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+              <Calendar className="w-6 h-6 text-blue-600 group-hover:text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-accent">Manage Events</h3>
+              <p className="text-sm text-muted">Add, edit, or remove calendar events</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+          </Link>
+        )}
       </div>
 
       {/* Recent Content */}
@@ -142,9 +146,11 @@ export default function AdminDashboardPage() {
               <Play className="w-4 h-4 text-primary" />
               Recent Updates
             </h3>
-            <Link to="/admin/updates" className="text-xs text-primary hover:underline">
-              View All
-            </Link>
+            {canManageUpdates && (
+              <Link to="/admin/updates" className="text-xs text-primary hover:underline">
+                View All
+              </Link>
+            )}
           </div>
           <div className="divide-y divide-border">
             {recentUpdates.length === 0 ? (
@@ -179,9 +185,11 @@ export default function AdminDashboardPage() {
               <Calendar className="w-4 h-4 text-primary" />
               Upcoming Events
             </h3>
-            <Link to="/admin/events" className="text-xs text-primary hover:underline">
-              View All
-            </Link>
+            {canManageEvents && (
+              <Link to="/admin/events" className="text-xs text-primary hover:underline">
+                View All
+              </Link>
+            )}
           </div>
           <div className="divide-y divide-border">
             {upcomingEvents.length === 0 ? (
