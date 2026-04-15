@@ -185,11 +185,17 @@ export default function AdminEventsPage() {
       return;
     }
 
-    const eventData = {
-      ...form,
-      endDate: isMultiDay && form.endDate ? form.endDate : undefined,
+    const { endDate, ...restForm } = form;
+    const eventData: any = {
+      ...restForm,
       status: canApproveEvents ? 'approved' : 'pending',
     };
+    
+    if (isMultiDay && form.endDate) {
+      eventData.endDate = form.endDate;
+    } else {
+      eventData.endDate = null;
+    }
 
     if (editingEvent) {
       editEvent(editingEvent.id, eventData);
