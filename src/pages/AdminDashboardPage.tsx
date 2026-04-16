@@ -125,19 +125,34 @@ export default function AdminDashboardPage() {
           </Link>
         )}
         {canManageEvents && (
-          <Link
-            to="/admin/events"
-            className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
-          >
-            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-              <Calendar className="w-6 h-6 text-blue-600 group-hover:text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-accent">Manage Events</h3>
-              <p className="text-sm text-muted">Add, edit, or remove calendar events</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-muted group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-          </Link>
+          <>
+            <Link
+              to="/admin/events"
+              className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all"
+            >
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                <Calendar className="w-6 h-6 text-blue-600 group-hover:text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-accent">Manage Events</h3>
+                <p className="text-sm text-muted">Add, edit, or remove calendar events</p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-muted group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+            </Link>
+            <Link
+              to="/admin/client-requests"
+              className="group flex items-center gap-4 p-5 bg-white rounded-xl border border-border hover:border-purple-300 hover:shadow-md transition-all"
+            >
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                <Calendar className="w-6 h-6 text-purple-600 group-hover:text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-accent">Client Requests</h3>
+                <p className="text-sm text-muted">Review Google Form submissions</p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-muted group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+            </Link>
+          </>
         )}
         {canApproveEvents && (
           <Link

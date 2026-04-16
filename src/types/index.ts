@@ -13,6 +13,22 @@ export type EventType = 'ADMIN COVERAGE' | 'STUDENT COVERAGE' | 'PROJECT' | 'CAP
 export type DepartmentType = 'Multimedia' | 'Graphics';
 export type RequestType = 'Design Request' | 'Pubmat Checking' | 'Approval';
 
+export interface ClientRequest {
+  id: string;
+  title: string;
+  department: DepartmentType;
+  eventType?: EventType;
+  requestType?: RequestType;
+  date: string;
+  time: string;
+  venue: string;
+  description: string;
+  clientName: string;
+  clientEmail: string;
+  status: 'pending_scosec' | 'submitted_to_scodir' | 'rejected_by_scosec';
+  createdAt: string;
+}
+
 export interface CalendarEvent {
   id: string;
   title: string;

@@ -38,12 +38,16 @@ export default function Navbar() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/updates', label: 'Updates', icon: ImageIcon },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
+    { path: '/request', label: 'Request Coverage', icon: CheckCircle },
   ];
 
   const adminLinks = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     ...(canManageUpdates ? [{ path: '/admin/updates', label: 'Manage Updates', icon: ImageIcon }] : []),
-    ...(canManageEvents ? [{ path: '/admin/events', label: 'Manage Events', icon: Calendar }] : []),
+    ...(canManageEvents ? [
+      { path: '/admin/events', label: 'Manage Events', icon: Calendar },
+      { path: '/admin/client-requests', label: 'Client Requests', icon: Calendar }
+    ] : []),
     ...(canApproveEvents ? [{ path: '/admin/approvals', label: 'Approvals', icon: CheckCircle }] : []),
   ];
 

@@ -8,11 +8,13 @@ import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import UpdatesPage from './pages/UpdatesPage';
 import CalendarPage from './pages/CalendarPage';
+import ClientRequestPage from './pages/ClientRequestPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUpdatesPage from './pages/AdminUpdatesPage';
 import AdminEventsPage from './pages/AdminEventsPage';
 import AdminApprovalsPage from './pages/AdminApprovalsPage';
+import AdminClientRequestsPage from './pages/AdminClientRequestsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function AppContent() {
@@ -33,6 +35,7 @@ function AppContent() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/updates" element={<UpdatesPage />} />
                 <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/request" element={<ClientRequestPage />} />
 
                 {/* Admin Pages */}
                 <Route
@@ -56,6 +59,14 @@ function AppContent() {
                   element={
                     <ProtectedAdminRoute requireManageEvents>
                       <AdminEventsPage />
+                    </ProtectedAdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/client-requests"
+                  element={
+                    <ProtectedAdminRoute requireManageEvents>
+                      <AdminClientRequestsPage />
                     </ProtectedAdminRoute>
                   }
                 />

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { Update, CalendarEvent, AppNotification } from '../types';
+import { Update, CalendarEvent, AppNotification, ClientRequest } from '../types';
 import { db } from '../firebase';
 import { collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
@@ -7,12 +7,15 @@ interface DataContextType {
   updates: Update[];
   events: CalendarEvent[];
   notifications: AppNotification[];
+  clientRequests: ClientRequest[];
   addUpdate: (update: Omit<Update, 'id' | 'createdAt' | 'updatedAt'>) => void;
   editUpdate: (id: string, update: Partial<Update>) => void;
   deleteUpdate: (id: string) => void;
   addEvent: (event: Omit<CalendarEvent, 'id' | 'createdAt'>) => void;
   editEvent: (id: string, event: Partial<CalendarEvent>) => void;
   deleteEvent: (id: string) => void;
+  addClientRequest: (request: Omit<ClientRequest, 'id' | 'createdAt' | 'status'>) => void;
+  updateClientRequest: (id: string, partial: Partial<ClientRequest>) => void;
   markNotificationAsRead: (id: string) => void;
   markAllNotificationsAsRead: () => void;
   loading: boolean;
@@ -53,6 +56,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [clientRequests, setClientRequests] = useState<ClientRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,10 +76,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }, (error) => handleFirestoreError(error, OperationType.LIST, 'notifications'));
 
+    const unsubClientRequests = onSnapshot(collection(db, 'clientRequests'), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ClientRequest));
+      setClientRequests(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    }, (error) => handleFirestoreError(error, OperationType.LIST, 'clientRequests'));
+
     return () => {
       unsubUpdates();
       unsubEvents();
       unsubNotifications();
+      unsubClientRequests();
     };
   }, []);
 
@@ -183,18 +193,47 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateClientRequest = useCallback(async (id: string, partial: Partial<ClientRequest>) => {
+    try {
+      await updateDoc(doc(db, 'clientRequests', id), partial);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `clientRequests/${id}`);
+    }
+  }, []);
+
+  const addClientRequest = useCallback(async (request: Omit<ClientRequest, 'id' | 'createdAt' | 'status'>) => {
+    try {
+      const id = Date.now().toString();
+      const newRequest = {
+        ...request,
+        status: 'pending_scosec',
+        createdAt: new Date().toISOString(),
+      };
+      await setDoc(doc(db, 'clientRequests', id), newRequest);
+      await addNotification({
+        message: `New client request from ${request.clientName}`,
+        link: '/admin/client-requests'
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'clientRequests');
+    }
+  }, [addNotification]);
+
   return (
     <DataContext.Provider
       value={{
         updates,
         events,
         notifications,
+        clientRequests,
         addUpdate,
         editUpdate,
         deleteUpdate,
         addEvent,
         editEvent,
         deleteEvent,
+        addClientRequest,
+        updateClientRequest,
         markNotificationAsRead,
         markAllNotificationsAsRead,
         loading,
