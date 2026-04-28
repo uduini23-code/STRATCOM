@@ -20,6 +20,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { compressImage } from '../lib/imageUtils';
 
 export const EVENT_COLORS: Record<EventType, string> = {
   'ADMIN COVERAGE': 'bg-blue-100 text-blue-800 border-blue-200',
@@ -82,7 +83,7 @@ export default function AdminEventsPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validFiles = files.filter(file => {
       const ext = file.name.split('.').pop()?.toLowerCase();
@@ -93,20 +94,47 @@ export default function AdminEventsPage() {
       showToast('Some files were rejected. Only PDF, PNG, JPEG, PPT, and PSD are allowed.', 'error');
     }
 
-    validFiles.forEach(file => {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast(`File ${file.name} is too large (max 5MB)`, 'error');
-        return;
+    for (const file of validFiles) {
+      const isImage = file.type.startsWith('image/') || ['png', 'jpeg', 'jpg'].includes(file.name.split('.').pop()?.toLowerCase() || '');
+      
+      if (!isImage && file.size > 800 * 1024) {
+        showToast(`File ${file.name} is too large. Non-image files max 800KB due to database limits.`, 'error');
+        continue;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm(prev => ({
-          ...prev,
-          attachments: [...prev.attachments, { name: file.name, data: reader.result as string }]
-        }));
-      };
-      reader.readAsDataURL(file);
-    });
+      
+      try {
+        let fileData: string;
+        
+        if (isImage) {
+          // Compress image to ~400KB
+          fileData = await compressImage(file, 0.4);
+        } else {
+          // Read non-image files directly (already verified < 800KB)
+          fileData = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
+        
+        setForm(prev => {
+          // Calculate total size of attachments to prevent exceeding 1MB total doc size
+          const currentSize = prev.attachments.reduce((acc, curr) => acc + curr.data.length, 0);
+          if (currentSize + fileData.length > 900 * 1024) { // keep some buffer for other fields
+            showToast('Cannot add more files. Total attachment size would exceed maximum allowed limit.', 'error');
+            return prev;
+          }
+          return {
+            ...prev,
+            attachments: [...prev.attachments, { name: file.name, data: fileData }]
+          };
+        });
+      } catch (error) {
+        console.error('Error processing file:', file.name, error);
+        showToast(`Failed to process ${file.name}`, 'error');
+      }
+    }
   };
 
   const removeAttachment = (index: number) => {
@@ -703,7 +731,7 @@ export default function AdminEventsPage() {
                   />
                   <Upload className="w-6 h-6 text-muted mx-auto mb-2" />
                   <p className="text-sm text-accent font-medium">Click to upload files</p>
-                  <p className="text-xs text-muted mt-1">PDF, PNG, JPEG, PPT, PSD (Max 5MB each)</p>
+                  <p className="text-xs text-muted mt-1">PDF, PPT, PSD (Max 800KB each), Images (auto-compressed)</p>
                 </div>
                 {form.attachments.length > 0 && (
                   <div className="mt-3 space-y-2">

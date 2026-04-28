@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
+import { compressImage } from '../lib/imageUtils';
+
 export default function AdminUpdatesPage() {
   const { updates, addUpdate, editUpdate, deleteUpdate } = useData();
   const { showToast } = useToast();
@@ -41,18 +43,20 @@ export default function AdminUpdatesPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         showToast('Image must be less than 5MB', 'error');
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm({ ...form, thumbnail: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedBase64 = await compressImage(file, 0.4); // max 400KB
+        setForm({ ...form, thumbnail: compressedBase64 });
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        showToast('Error processing image', 'error');
+      }
     }
   };
 
