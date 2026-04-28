@@ -608,7 +608,7 @@ export default function AdminEventsPage() {
 
               {/* Venue & Assigned To */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {form.department === 'Multimedia' && (
+                {form.department === 'Multimedia' ? (
                   <div>
                     <label className="block text-sm font-medium text-accent mb-1.5">
                       <MapPin className="w-3.5 h-3.5 inline mr-1.5" />
@@ -623,31 +623,32 @@ export default function AdminEventsPage() {
                       className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                     />
                   </div>
+                ) : (
+                  <div></div>
                 )}
-                {form.department === 'Graphics' && (
-                  <div>
-                    <label className="block text-sm font-medium text-accent mb-1.5">
-                      <UsersIcon className="w-3.5 h-3.5 inline mr-1.5" />
-                      Assign To *
-                    </label>
-                    <div className="relative">
-                      <select
-                        multiple
-                        value={form.assignedTo}
-                        onChange={(e) => {
-                          const values = Array.from(e.target.selectedOptions, option => option.value);
-                          setForm({ ...form, assignedTo: values });
-                        }}
-                        className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all bg-white h-[46px]"
-                      >
-                        {ASSIGNABLE_USERS.filter(u => u.name === 'Zak' || u.name === 'Pjohn').map(user => (
-                          <option key={user.id} value={user.id}>{user.name}</option>
-                        ))}
-                      </select>
-                      <p className="text-[10px] text-muted mt-1">Hold Ctrl/Cmd to select multiple</p>
-                    </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-accent mb-1.5">
+                    <UsersIcon className="w-3.5 h-3.5 inline mr-1.5" />
+                    Assign To {form.department === 'Graphics' ? '*' : ''}
+                  </label>
+                  <div className="relative">
+                    <select
+                      multiple
+                      value={form.assignedTo}
+                      onChange={(e) => {
+                        const values = Array.from(e.target.selectedOptions, option => option.value);
+                        setForm({ ...form, assignedTo: values });
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all bg-white h-[100px]"
+                    >
+                      {ASSIGNABLE_USERS.filter(u => form.department === 'Graphics' ? (u.name === 'Zak' || u.name === 'Pjohn') : true).map(user => (
+                        <option key={user.id} value={user.id}>{user.name}</option>
+                      ))}
+                    </select>
+                    <p className="text-[10px] text-muted mt-1">Hold Ctrl/Cmd to select multiple</p>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Description */}
