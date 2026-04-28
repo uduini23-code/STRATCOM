@@ -155,12 +155,15 @@ export default function ClientRequestPage() {
                   >
                     <option value="Multimedia">Multimedia (Photo/Video)</option>
                     <option value="Graphics">Graphics (Design)</option>
+                    <option value="Others">Others</option>
                   </select>
                 </div>
 
-                {form.department === 'Multimedia' ? (
+                {form.department === 'Multimedia' || form.department === 'Others' ? (
                   <div>
-                    <label className="block text-sm font-medium text-accent mb-1.5">Event Type *</label>
+                    <label className="block text-sm font-medium text-accent mb-1.5">
+                      {form.department === 'Others' ? 'Event Type *' : 'Event Type *'}
+                    </label>
                     <select
                       value={form.eventType}
                       onChange={(e) => setForm({ ...form, eventType: e.target.value as EventType })}
@@ -170,6 +173,7 @@ export default function ClientRequestPage() {
                       <option value="STUDENT COVERAGE">Student Coverage</option>
                       <option value="PROJECT">Project</option>
                       <option value="CAPACITY BUILDING">Capacity Building</option>
+                      <option value="Others">Others</option>
                     </select>
                   </div>
                 ) : (

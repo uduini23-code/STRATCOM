@@ -9,8 +9,8 @@ export interface Update {
   category?: EventType;
 }
 
-export type EventType = 'ADMIN COVERAGE' | 'STUDENT COVERAGE' | 'PROJECT' | 'CAPACITY BUILDING';
-export type DepartmentType = 'Multimedia' | 'Graphics';
+export type EventType = 'ADMIN COVERAGE' | 'STUDENT COVERAGE' | 'PROJECT' | 'CAPACITY BUILDING' | 'Others';
+export type DepartmentType = 'Multimedia' | 'Graphics' | 'Others';
 export type RequestType = 'Design Request' | 'Pubmat Checking' | 'Approval';
 
 export interface ClientRequest {

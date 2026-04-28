@@ -27,6 +27,7 @@ export const EVENT_COLORS: Record<EventType, string> = {
   'STUDENT COVERAGE': 'bg-pink-100 text-pink-800 border-pink-200',
   'PROJECT': 'bg-violet-100 text-violet-800 border-violet-200',
   'CAPACITY BUILDING': 'bg-amber-100 text-amber-900 border-amber-200',
+  'Others': 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
 const ASSIGNABLE_USERS = [
@@ -74,7 +75,7 @@ export default function AdminEventsPage() {
     endTime: '',
     venue: '',
     description: '',
-    department: 'For MultiMedia',
+    department: 'Multimedia',
     eventType: 'ADMIN COVERAGE',
     requestType: 'Design Request',
     assignedTo: [],
@@ -529,6 +530,7 @@ export default function AdminEventsPage() {
                 >
                   <option value="Multimedia">Multimedia</option>
                   <option value="Graphics">Graphics</option>
+                  <option value="Others">Others</option>
                 </select>
               </div>
 
@@ -551,9 +553,9 @@ export default function AdminEventsPage() {
                 <div>
                   <label className="block text-sm font-medium text-accent mb-1.5">
                     <Tag className="w-3.5 h-3.5 inline mr-1.5" />
-                    {form.department === 'Multimedia' ? 'Event Type *' : 'Request Type *'}
+                    {form.department === 'Graphics' ? 'Request Type *' : 'Event Type *'}
                   </label>
-                  {form.department === 'Multimedia' ? (
+                  {form.department === 'Multimedia' || form.department === 'Others' ? (
                     <select
                       value={form.eventType}
                       onChange={(e) => setForm({ ...form, eventType: e.target.value as EventType })}
@@ -564,6 +566,7 @@ export default function AdminEventsPage() {
                       <option value="STUDENT COVERAGE">STUDENT COVERAGE</option>
                       <option value="PROJECT">PROJECT</option>
                       <option value="CAPACITY BUILDING">CAPACITY BUILDING</option>
+                      <option value="Others">Others</option>
                     </select>
                   ) : (
                     <select
