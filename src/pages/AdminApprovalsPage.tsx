@@ -74,7 +74,7 @@ export default function AdminApprovalsPage() {
               body: JSON.stringify({
                 to: user.email,
                 subject: `Event Assignment: ${updatedEvent.department === 'Multimedia' ? updatedEvent.eventType : updatedEvent.requestType}`,
-                text: `Hello ${user.name},\n\n${greetingText}\n\nEvent: ${updatedEvent.title}\nDate: ${updatedEvent.date} ${isMultiDay && updatedEvent.endDate ? `to ${updatedEvent.endDate}` : ''}\nTime: ${updatedEvent.time}\nVenue: ${updatedEvent.venue}\nDescription: ${updatedEvent.description}\n\nThank you.`,
+                text: `Hello ${user.name},\n\n${greetingText}\n\nEvent: ${updatedEvent.title}\nDate: ${updatedEvent.date} ${isMultiDay && updatedEvent.endDate ? `to ${updatedEvent.endDate}` : ''}\nTime: ${updatedEvent.startTime} - ${updatedEvent.endTime}\nVenue: ${updatedEvent.venue}\nDescription: ${updatedEvent.description}\n\nThank you.`,
                 html: `
                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #16a34a;">${updatedEvent.title}</h2>
@@ -95,7 +95,7 @@ export default function AdminApprovalsPage() {
                       </tr>
                       <tr>
                         <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Time:</strong></td>
-                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${updatedEvent.time}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${updatedEvent.startTime} - ${updatedEvent.endTime}</td>
                       </tr>
                       <tr>
                         <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Venue:</strong></td>
@@ -167,7 +167,7 @@ export default function AdminApprovalsPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted">
                   <Clock className="w-4 h-4 text-primary" />
-                  <span>{event.time}</span>
+                  <span>{event.startTime} - {event.endTime}</span>
                 </div>
               </div>
 
@@ -228,7 +228,7 @@ export default function AdminApprovalsPage() {
                   <p className="text-xs font-medium text-muted mb-1">Time</p>
                   <p className="text-sm font-medium text-accent flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-primary" />
-                    {selectedEvent.time}
+                    {selectedEvent.startTime} - {selectedEvent.endTime}
                   </p>
                 </div>
                 {selectedEvent.venue && (

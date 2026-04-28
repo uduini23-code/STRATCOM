@@ -21,7 +21,8 @@ export default function AdminClientRequestsPage() {
       eventType: request.eventType,
       requestType: request.requestType,
       date: request.date,
-      time: request.time,
+      startTime: request.startTime,
+      endTime: request.endTime,
       venue: request.venue,
       description: request.description,
     });
@@ -36,7 +37,7 @@ export default function AdminClientRequestsPage() {
     e.preventDefault();
     if (!selectedRequest) return;
 
-    if (!form.title?.trim() || !form.date || !form.time) {
+    if (!form.title?.trim() || !form.date || !form.startTime || !form.endTime) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
@@ -53,7 +54,8 @@ export default function AdminClientRequestsPage() {
       eventType: form.eventType as EventType,
       requestType: form.requestType as RequestType,
       date: form.date,
-      time: form.time,
+      startTime: form.startTime,
+      endTime: form.endTime,
       venue: form.venue || '',
       description: `Client Request from: ${selectedRequest.clientName} (${selectedRequest.clientEmail})\n\n${form.description || ''}`,
       status: 'pending' as const, // Goes to SCODIR
@@ -123,7 +125,7 @@ export default function AdminClientRequestsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-primary" />
-                    {request.time}
+                    {request.startTime} - {request.endTime}
                   </div>
                 </div>
               </div>
@@ -225,7 +227,7 @@ export default function AdminClientRequestsPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-accent mb-1.5">Date *</label>
                     <input
@@ -237,11 +239,21 @@ export default function AdminClientRequestsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-accent mb-1.5">Time *</label>
+                    <label className="block text-sm font-medium text-accent mb-1.5">Start Time *</label>
                     <input
                       type="time"
-                      value={form.time || ''}
-                      onChange={(e) => setForm({ ...form, time: e.target.value })}
+                      value={form.startTime || ''}
+                      onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                      required
+                      className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-1.5">End Time *</label>
+                    <input
+                      type="time"
+                      value={form.endTime || ''}
+                      onChange={(e) => setForm({ ...form, endTime: e.target.value })}
                       required
                       className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                     />

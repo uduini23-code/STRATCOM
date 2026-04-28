@@ -56,7 +56,8 @@ export default function AdminEventsPage() {
     title: string;
     date: string;
     endDate: string;
-    time: string;
+    startTime: string;
+    endTime: string;
     venue: string;
     description: string;
     department: DepartmentType;
@@ -68,7 +69,8 @@ export default function AdminEventsPage() {
     title: '',
     date: '',
     endDate: '',
-    time: '',
+    startTime: '',
+    endTime: '',
     venue: '',
     description: '',
     department: 'For MultiMedia',
@@ -127,7 +129,7 @@ export default function AdminEventsPage() {
     setEditingEvent(null);
     setIsMultiDay(false);
     setForm({ 
-      title: '', date: '', endDate: '', time: '', venue: '', description: '', 
+      title: '', date: '', endDate: '', startTime: '', endTime: '', venue: '', description: '', 
       department: 'Multimedia', eventType: 'ADMIN COVERAGE', requestType: 'Design Request', 
       assignedTo: [], attachments: [] 
     });
@@ -141,7 +143,8 @@ export default function AdminEventsPage() {
       title: event.title,
       date: event.date,
       endDate: event.endDate || '',
-      time: event.time,
+      startTime: event.startTime,
+      endTime: event.endTime,
       venue: event.venue,
       description: event.description,
       department: event.department || 'Multimedia',
@@ -157,7 +160,7 @@ export default function AdminEventsPage() {
     setModalOpen(false);
     setEditingEvent(null);
     setForm({ 
-      title: '', date: '', endDate: '', time: '', venue: '', description: '', 
+      title: '', date: '', endDate: '', startTime: '', endTime: '', venue: '', description: '', 
       department: 'Multimedia', eventType: 'ADMIN COVERAGE', requestType: 'Design Request', 
       assignedTo: [], attachments: [] 
     });
@@ -165,7 +168,7 @@ export default function AdminEventsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.date || !form.time) {
+    if (!form.title.trim() || !form.date || !form.startTime || !form.endTime) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
@@ -220,7 +223,7 @@ export default function AdminEventsPage() {
                 body: JSON.stringify({
                   to: user.email,
                   subject: `Event Assignment: ${form.department === 'Multimedia' ? form.eventType : form.requestType}`,
-                  text: `Hello ${user.name},\n\n${greetingText}\n\nEvent: ${form.title}\nDate: ${form.date} ${isMultiDay && form.endDate ? `to ${form.endDate}` : ''}\nTime: ${form.time}\nVenue: ${form.venue}\nDescription: ${form.description}\n\nThank you.`,
+                  text: `Hello ${user.name},\n\n${greetingText}\n\nEvent: ${form.title}\nDate: ${form.date} ${isMultiDay && form.endDate ? `to ${form.endDate}` : ''}\nTime: ${form.startTime} - ${form.endTime}\nVenue: ${form.venue}\nDescription: ${form.description}\n\nThank you.`,
                   html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                       <h2 style="color: #16a34a;">${form.title}</h2>
@@ -241,7 +244,7 @@ export default function AdminEventsPage() {
                         </tr>
                         <tr>
                           <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Time:</strong></td>
-                          <td style="padding: 8px; border-bottom: 1px solid #eee;">${form.time}</td>
+                          <td style="padding: 8px; border-bottom: 1px solid #eee;">${form.startTime} - ${form.endTime}</td>
                         </tr>
                         <tr>
                           <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Venue:</strong></td>
@@ -402,7 +405,7 @@ export default function AdminEventsPage() {
                         </span>
                         <span className="inline-flex items-center gap-1.5 text-sm text-muted">
                           <Clock className="w-4 h-4 text-primary" />
-                          {event.time}
+                          {event.startTime} - {event.endTime}
                         </span>
                         {event.venue && (
                           <span className="inline-flex items-center gap-1.5 text-sm text-muted">
@@ -591,18 +594,33 @@ export default function AdminEventsPage() {
                     />
                   </div>
                 )}
-                <div className={isMultiDay ? 'sm:col-span-2' : ''}>
-                  <label className="block text-sm font-medium text-accent mb-1.5">
-                    <Clock className="w-3.5 h-3.5 inline mr-1.5" />
-                    Time *
-                  </label>
-                  <input
-                    type="time"
-                    value={form.time}
-                    onChange={(e) => setForm({ ...form, time: e.target.value })}
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-1.5">
+                      <Clock className="w-3.5 h-3.5 inline mr-1.5" />
+                      Start Time *
+                    </label>
+                    <input
+                      type="time"
+                      value={form.startTime}
+                      onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                      required
+                      className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-1.5">
+                      <Clock className="w-3.5 h-3.5 inline mr-1.5" />
+                      End Time *
+                    </label>
+                    <input
+                      type="time"
+                      value={form.endTime}
+                      onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                      required
+                      className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 

@@ -268,7 +268,7 @@ export default function CalendarPage() {
                       </div>
                       <div className="flex items-center gap-1 mt-0.5 text-xs opacity-80">
                         <Clock className="w-3 h-3" />
-                        {event.time}
+                        {event.startTime} - {event.endTime}
                       </div>
                     </button>
                   );
@@ -333,7 +333,7 @@ export default function CalendarPage() {
                 <Clock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted uppercase tracking-wider font-semibold">Time</p>
-                  <p className="text-accent font-medium">{selectedEvent.time}</p>
+                  <p className="text-accent font-medium">{selectedEvent.startTime} - {selectedEvent.endTime}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">

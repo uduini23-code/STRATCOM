@@ -217,7 +217,7 @@ export default function HomePage() {
                     <div className="flex flex-wrap gap-3 mt-1.5">
                       <span className="inline-flex items-center gap-1 text-xs text-muted">
                         <Clock className="w-3.5 h-3.5" />
-                        {event.time}
+                        {event.startTime} - {event.endTime}
                       </span>
                       {event.venue && (
                         <span className="inline-flex items-center gap-1 text-xs text-muted">

@@ -16,7 +16,8 @@ export default function ClientRequestPage() {
     eventType: 'PROJECT' as EventType,
     requestType: 'Design Request' as RequestType,
     date: '',
-    time: '',
+    startTime: '',
+    endTime: '',
     venue: '',
     description: '',
   });
@@ -24,7 +25,7 @@ export default function ClientRequestPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.clientName || !form.clientEmail || !form.title || !form.date || !form.time) {
+    if (!form.clientName || !form.clientEmail || !form.title || !form.date || !form.startTime || !form.endTime) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
@@ -42,7 +43,8 @@ export default function ClientRequestPage() {
       eventType: form.department === 'Multimedia' ? form.eventType : undefined,
       requestType: form.department === 'Graphics' ? form.requestType : undefined,
       date: form.date,
-      time: form.time,
+      startTime: form.startTime,
+      endTime: form.endTime,
       venue: form.venue,
       description: form.description,
     });
@@ -73,7 +75,8 @@ export default function ClientRequestPage() {
                 eventType: 'PROJECT',
                 requestType: 'Design Request',
                 date: '',
-                time: '',
+                startTime: '',
+                endTime: '',
                 venue: '',
                 description: '',
               });
@@ -185,7 +188,7 @@ export default function ClientRequestPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-accent mb-1.5">Date *</label>
                   <input
@@ -197,11 +200,21 @@ export default function ClientRequestPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-accent mb-1.5">Time *</label>
+                  <label className="block text-sm font-medium text-accent mb-1.5">Start Time *</label>
                   <input
                     type="time"
-                    value={form.time}
-                    onChange={(e) => setForm({ ...form, time: e.target.value })}
+                    value={form.startTime}
+                    onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                    required
+                    className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-accent mb-1.5">End Time *</label>
+                  <input
+                    type="time"
+                    value={form.endTime}
+                    onChange={(e) => setForm({ ...form, endTime: e.target.value })}
                     required
                     className="w-full px-4 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                   />

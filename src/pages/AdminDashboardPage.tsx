@@ -247,7 +247,7 @@ export default function AdminDashboardPage() {
                       <Clock className="w-3 h-3" />
                       {format(parseISO(event.date), 'MMM dd')}
                       {event.endDate && event.endDate !== event.date && ` - ${format(parseISO(event.endDate), 'MMM dd')}`}
-                      {' '}at {event.time}
+                      {' '}at {event.startTime} - {event.endTime}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs text-muted">
                       <MapPin className="w-3 h-3" />

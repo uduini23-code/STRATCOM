@@ -20,7 +20,8 @@ export interface ClientRequest {
   eventType?: EventType;
   requestType?: RequestType;
   date: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   venue: string;
   description: string;
   clientName: string;
@@ -34,7 +35,8 @@ export interface CalendarEvent {
   title: string;
   date: string; // YYYY-MM-DD
   endDate?: string; // YYYY-MM-DD
-  time: string;
+  startTime: string;
+  endTime: string;
   venue: string;
   description: string;
   createdAt: string;
